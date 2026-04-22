@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Сборник Стихов</title>
+
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Noto+Serif:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/screens.css">
+</head>
+<body>
+
+  <!-- ── Loading ─────────────────────────────────────── -->
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <div class="loading-text">Загрузка…</div>
+  </div>
+
+  <!-- ── Toast ───────────────────────────────────────── -->
+  <div id="toast"></div>
+
+  <!-- ── App Shell ───────────────────────────────────── -->
+  <div id="app">
+
+    <!-- Screens are injected here by router.js -->
+    <div id="screens-container"></div>
+
+  </div>
+
+  <!-- ── Core JS (порядок важен) ─────────────────────── -->
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/tg.js"></script>
+
+  <!-- Screen controllers -->
+  <script src="js/screens/poems.js"></script>
+  <script src="js/screens/poem-detail.js"></script>
+  <script src="js/screens/library.js"></script>
+  <script src="js/screens/library-detail.js"></script>
+  <script src="js/screens/add-poem.js"></script>
+  <script src="js/screens/discover.js"></script>
+  <script src="js/screens/chat.js"></script>
+  <script src="js/screens/profile.js"></script>
+  <script src="js/screens/settings.js"></script>
+  <script src="js/screens/admin.js"></script>
+
+  <!-- Boot -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>

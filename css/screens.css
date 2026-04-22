@@ -1,0 +1,173 @@
+/* ═══════════════════════════════════════════════════
+   SCREENS — transitions, per-screen layout specifics
+   ═══════════════════════════════════════════════════ */
+
+/* ── Screen base ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--tg-bg);
+  will-change: transform;
+  overflow: hidden;
+}
+
+/* States */
+.screen.state-hidden        { transform: translateX(100%);  transition: none; visibility: hidden; }
+.screen.state-entering      { transform: translateX(100%);  transition: none; visibility: visible; }
+.screen.state-enter-active  { transform: translateX(0);     transition: transform .28s cubic-bezier(.4,0,.2,1); visibility: visible; }
+.screen.state-active        { transform: translateX(0);     transition: none; visibility: visible; }
+.screen.state-exit-active   { transform: translateX(-30%);  transition: transform .28s cubic-bezier(.4,0,.2,1); visibility: visible; }
+.screen.state-exited        { transform: translateX(-30%);  transition: none; visibility: hidden; }
+
+/* Main screen never slides in */
+.screen#screen-main {
+  transform: none !important;
+  visibility: visible !important;
+}
+.screen#screen-main.state-hidden,
+.screen#screen-main.state-exited { display: none; }
+.screen#screen-main.state-active { display: flex; }
+
+/* ── Scroll area ── */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Poem detail ── */
+.poem-detail-meta {
+  padding: 16px 16px 0;
+  background: var(--tg-section-bg);
+  border-bottom: 1px solid var(--tg-section-sep);
+}
+.poem-detail-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--tg-text);
+}
+.poem-detail-author {
+  font-size: 14px;
+  color: var(--tg-hint);
+  font-style: italic;
+  margin-top: 6px;
+}
+.poem-detail-actions {
+  padding: 12px 0 14px;
+}
+.poem-text-wrap {
+  padding: 20px 16px 40px;
+}
+.poem-full-text {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--tg-text);
+  white-space: pre-wrap;
+  letter-spacing: .01em;
+}
+
+/* ── Library header ── */
+.lib-detail-hero {
+  padding: 16px;
+  background: var(--tg-section-bg);
+  border-bottom: 1px solid var(--tg-section-sep);
+}
+.lib-detail-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--tg-text);
+}
+.lib-detail-desc {
+  font-size: 13px;
+  color: var(--tg-hint);
+  margin-top: 4px;
+  font-style: italic;
+  line-height: 1.5;
+}
+.lib-detail-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+  align-items: center;
+}
+.lib-detail-stat {
+  font-size: 12px;
+  color: var(--tg-hint);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.lib-detail-stat svg { width: 14px; height: 14px; }
+.lib-detail-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.lib-detail-actions .btn-primary { font-size: 13px; padding: 9px 14px; border-radius: var(--radius-lg); }
+
+/* ── Settings screen ── */
+.settings-section-label {
+  padding: 20px 16px 6px;
+  font-size: 12px;
+  color: var(--tg-hint);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  font-weight: 600;
+}
+
+/* ── Admin screen ── */
+.admin-section {
+  padding: 12px 16px;
+  background: var(--tg-section-bg);
+  border-bottom: 1px solid var(--tg-section-sep);
+}
+.admin-key-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--tg-section-sep);
+  font-size: 13px;
+}
+.admin-key-row:last-child { border-bottom: none; }
+.admin-key-mono {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--tg-hint);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Pinned poem card ── */
+.pinned-card {
+  margin: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--tg-section-bg);
+  border: 1px solid var(--tg-section-sep);
+  padding: 13px 15px;
+  cursor: pointer;
+  transition: background .1s;
+}
+.pinned-card:active { background: var(--tg-surface); }
+.pinned-card-label {
+  font-size: 11px;
+  color: var(--tg-hint);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pinned-card-label svg { width: 12px; height: 12px; }
