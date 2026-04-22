@@ -3,18 +3,24 @@
    ═══════════════════════════════════════════════════ */
 
 const TG = {
+  /** true если запущено в реальном Telegram, false если в браузере */
+  isReal: false,
+
   /** Инициализирует Telegram SDK, применяет тему */
   init() {
     const tg = window.Telegram?.WebApp;
 
-    if (!tg || !tg.initData) {
-      // Dev-режим: мок объект
-      this._installMock();
-    } else {
+    // Считаем "реальным TG" если initData непустая строка
+    // (в браузере tg.initData === '' или объект отсутствует)
+    if (tg && tg.initData && tg.initData.length > 0) {
+      this.isReal = true;
       tg.ready();
       tg.expand();
       tg.enableClosingConfirmation();
       tg.onEvent('themeChanged', () => this.applyTheme(tg.themeParams));
+    } else {
+      // Открыто в обычном браузере — устанавливаем dev-мок
+      this._installMock();
     }
 
     State.tgUser = window.Telegram.WebApp.initDataUnsafe?.user || null;
@@ -23,34 +29,37 @@ const TG = {
 
   /** Dev-мок когда открываем в браузере без TG */
   _installMock() {
-    if (window.Telegram?.WebApp) return;
-    window.Telegram = {
-      WebApp: {
-        initData: 'dev_mode',
-        initDataUnsafe: {
-          user: {
-            id: 99999999,
-            first_name: 'Dev',
-            last_name:  'User',
-            username:   'devuser',
-            photo_url:  null,
-          },
+    if (!window.Telegram) window.Telegram = { WebApp: {} };
+    const wb = window.Telegram.WebApp;
+
+    // Заполняем только пустые поля — не перетираем если SDK уже что-то дал
+    wb.initData = 'dev_mode';
+    if (!wb.initDataUnsafe?.user) {
+      wb.initDataUnsafe = {
+        user: {
+          id:         99999999,
+          first_name: 'Dev',
+          last_name:  'User',
+          username:   'devuser',
+          photo_url:  null,
         },
-        themeParams: {},
-        ready:                      () => {},
-        expand:                     () => {},
-        enableClosingConfirmation:  () => {},
-        onEvent:                    () => {},
-        close:                      () => {},
-        HapticFeedback: {
-          impactOccurred:       () => {},
-          notificationOccurred: () => {},
-        },
-        showPopup: (opts, cb) => {
-          if (confirm(opts.message)) cb?.('ok');
-        },
-      },
+      };
+    }
+    wb.themeParams    = wb.themeParams    || {};
+    wb.ready          = wb.ready          || (() => {});
+    wb.expand         = wb.expand         || (() => {});
+    wb.enableClosingConfirmation = wb.enableClosingConfirmation || (() => {});
+    wb.onEvent        = wb.onEvent        || (() => {});
+    wb.close          = wb.close          || (() => {});
+    wb.HapticFeedback = wb.HapticFeedback || {
+      impactOccurred:       () => {},
+      notificationOccurred: () => {},
     };
+    wb.showPopup = wb.showPopup || ((opts, cb) => {
+      if (confirm(opts.message)) cb?.('ok');
+    });
+
+    console.info('[TG] Dev mode — running outside Telegram');
   },
 
   /** Применяет цвета темы Telegram к CSS-переменным */
@@ -95,18 +104,32 @@ const TG = {
 
   /** Авторизация через /api/auth/telegram */
   async auth() {
-    const tg = window.Telegram.WebApp;
-    const initData = tg.initData;
+    const wb       = window.Telegram?.WebApp;
+    const initData = wb?.initData;
     if (!initData) return false;
 
-    const devUser = (initData === 'dev_mode') ? tg.initDataUnsafe.user : null;
-    const data = await API.telegramAuth(initData, devUser);
-    if (!data?.access_token) return false;
+    const isDev   = (initData === 'dev_mode');
+    const devUser = isDev ? (wb.initDataUnsafe?.user || null) : null;
 
-    State.accessToken  = data.access_token;
-    State.refreshToken = data.refresh_token;
-    Store.set('ss_access',  State.accessToken);
-    Store.set('ss_refresh', State.refreshToken);
-    return true;
+    try {
+      const data = await API.telegramAuth(initData, devUser);
+      if (!data?.access_token) return false;
+
+      State.accessToken  = data.access_token;
+      State.refreshToken = data.refresh_token;
+      Store.set('ss_access',  State.accessToken);
+      Store.set('ss_refresh', State.refreshToken);
+      return true;
+    } catch (e) {
+      console.error('[TG.auth] failed:', e.message);
+      // Подсказка если сервер вернул 403 на dev_mode
+      if (isDev && String(e.message).includes('403')) {
+        console.warn(
+          '[TG.auth] Сервер запрещает dev_mode.\n' +
+          'Решение: добавьте DEV_MODE=true в .env бекенда.'
+        );
+      }
+      return false;
+    }
   },
 };
