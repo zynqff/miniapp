@@ -4,7 +4,7 @@
 
 const Config = Object.freeze({
   /** Базовый URL вашего Go-бекенда */
-  API_BASE: 'https://huggingface.co/spaces/Zynqochka/ssback-go',  // ← замените
+  API_BASE: 'https://zynqochka-ssback-go.hf.space',  // ← заменить потом
 
   /** Акцентные цвета для кастомизации (hex) */
   ACCENT_COLORS: [
